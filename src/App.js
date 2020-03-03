@@ -1,26 +1,41 @@
 import React from 'react';
-import logo from './logo.svg';
+import Search from './components/search'
+import IssueList from './components/IssueList'
+
 import './App.css';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+class App extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state={
+      list: [],
+      filteredList: []
+    }
+  }
+
+  componentDidMount() {
+    fetch('https://api.github.com/repos/facebook/react/issues')
+    .then((response) => {
+      return response.json()
+    }).then((data) => {
+      this.setState({list: data})
+      this.setState({filteredList: data})
+  })
+  }
+
+  filterList(filterString) {
+    const filteredList = this.state.list.filter((element) => element.title.includes(filterString))
+    this.setState({filteredList: filteredList})
+  }
+
+  render () {
+    return (
+      <div className="App">
+        <Search filterList={this.filterList.bind(this)}/>
+        <IssueList list={this.state.filteredList}/>
+      </div>
+    );
+  }
 }
 
 export default App;
